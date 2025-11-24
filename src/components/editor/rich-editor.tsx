@@ -104,23 +104,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
             </div>
         </div>
     );
-};
-
-export function RichEditor({ content = "" }: { content?: string }) {
-    const editor = useEditor({
-        extensions: [StarterKit],
-        content: content || '<p>Comece a escrever seu documento aqui...</p>',
-        editorProps: {
-            attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none dark:prose-invert min-h-[500px] p-4',
-            },
-        },
-    });
-
-    return (
-        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
             <MenuBar editor={editor} />
             <EditorContent editor={editor} />
-        </div>
+        </div >
     );
 }
