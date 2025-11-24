@@ -78,17 +78,20 @@ export class GeminiFileSearchService {
         storeId: string
     ): Promise<{ answer: string; citations?: any }> {
         try {
+            // The SDK's Tool type may not include the fileSearch helper in its typings.
+            // Cast the tools array to 'any' to avoid a TypeScript error while keeping runtime behavior.
             const model = genAI.getGenerativeModel({
                 model: 'gemini-2.0-flash-exp',
                 tools: [
                     {
+                        // @ts-ignore
                         fileSearch: {
                             fileSearchRetrievalResource: {
                                 fileSearchStore: storeId
                             }
                         }
                     }
-                ]
+                ] as any
             });
 
             const result = await model.generateContent(query);
