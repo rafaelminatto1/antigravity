@@ -105,6 +105,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
                 </Button>
             </div>
         </div>
+    );
 };
 
 export function RichEditor({ content = "" }: { content?: string }) {
