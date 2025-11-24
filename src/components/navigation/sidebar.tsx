@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   Activity,
-  DollarSign
+  DollarSign,
+  Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import { NotificationPopover } from "@/components/navigation/notification-popove
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/notebooks", label: "Notebooks", icon: BookOpen },
+  { href: "/knowledge", label: "Base de Conhecimento", icon: Database },
   { href: "/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/team", label: "Equipe", icon: Users },
   { href: "/financial", label: "Financeiro", icon: DollarSign },
