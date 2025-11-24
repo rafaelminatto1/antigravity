@@ -1,0 +1,31 @@
+
+> web-app@0.1.0 build
+> next build
+
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\rafal\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\rafal\OneDrive\Documentos\antigravity\package-lock.json
+
+   Ôû▓ Next.js 16.0.3 (Turbopack)
+   - Environments: .env.local
+
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 9.1s
+   Running TypeScript ...
+Failed to compile.
+
+./minatto/web-app/src/components/editor/rich-editor.tsx:18:34
+Type error: Cannot find module './templates' or its corresponding type declarations.
+
+  16 | } from "lucide-react";
+  17 |
+> 18 | import { TemplateSelector } from "./templates";
+     |                                  ^
+  19 | import { AISuggestions } from "./ai-suggestions";
+  20 |
+  21 | const MenuBar = ({ editor }: { editor: Editor | null }) => {
+Next.js build worker exited with code: 1 and signal: null
