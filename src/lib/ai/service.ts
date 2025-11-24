@@ -4,6 +4,10 @@ export interface AITreatmentSuggestion {
     duration: string;
     frequency: string;
 }
+export interface AISummary {
+    summary: string;
+    keyPoints: string[];
+}
 
 export const aiService = {
     async getTreatmentSuggestions(_case: string): Promise<AITreatmentSuggestion[]> {
@@ -23,4 +27,16 @@ export const aiService = {
             },
         ];
     },
+
+    async summarizePatientHistory(_patientId: string): Promise<AISummary> {
+        // Simple mock summary
+        return {
+            summary: 'Resumo automático: recomenda-se reavaliação e continuidade do programa domiciliar.',
+            keyPoints: [
+                'Relato de melhora na dor',
+                'Adesão ao plano domiciliar',
+                'Progresso em força muscular'
+            ]
+        };
+    }
 };
