@@ -1,38 +1,79 @@
+import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, Calendar, TrendingUp } from "lucide-react";
 
-const kpiData = [
-    {
-        title: "Pacientes Ativos",
-        value: "124",
-        change: "+12%",
-        icon: Users,
-        description: "Total de pacientes em tratamento",
-    },
-    {
-        title: "Sessões Realizadas",
-        value: "432",
-        change: "+5%",
-        icon: Activity,
-        description: "Neste mês",
-    },
-    {
-        title: "Agendamentos",
-        value: "28",
-        change: "+2",
-        icon: Calendar,
-        description: "Para hoje",
-    },
-    {
-        title: "Faturamento",
-        value: "R$ 42.5k",
-        change: "+18%",
-        icon: TrendingUp,
-        description: "Receita mensal estimada",
-    },
-];
+export async function KPICards() {
+    const supabase = await createClient();
 
-export function KPICards() {
+    // Fetch Active Patients
+    const { count: activePatients } = await supabase
+        .from('patients')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+    // Fetch Today's Appointments
+    const today = new Date().toISOString().split('T')[0];
+    const { count: todayAppointments } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .gte('start_time', `${today}T00:00:00`)
+        .lte('start_time', `${today}T23:59:59`);
+
+    // Fetch Monthly Sessions (Completed Appointments this month)
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+    const { count: monthlySessions } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed')
+        .gte('start_time', startOfMonth);
+
+    // Fetch Monthly Revenue (Safe fetch, assuming transactions table might not exist yet or is empty)
+    let monthlyRevenue = 0;
+    try {
+        const { data: transactions, error } = await supabase
+            .from('transactions')
+            .select('amount')
+            .eq('type', 'income')
+            .gte('date', startOfMonth);
+
+        if (!error && transactions) {
+            monthlyRevenue = transactions.reduce((acc, curr) => acc + Number(curr.amount), 0);
+        }
+    } catch (e) {
+        console.log("Transactions table not ready yet");
+    }
+
+    const kpiData = [
+        {
+            title: "Pacientes Ativos",
+            value: activePatients || 0,
+            change: "+12%", // Placeholder for trend
+            icon: Users,
+            description: "Total de pacientes em tratamento",
+        },
+        {
+            title: "Sessões Realizadas",
+            value: monthlySessions || 0,
+            change: "+5%", // Placeholder for trend
+            icon: Activity,
+            description: "Neste mês",
+        },
+        {
+            title: "Agendamentos",
+            value: todayAppointments || 0,
+            change: "+2", // Placeholder for trend
+            icon: Calendar,
+            description: "Para hoje",
+        },
+        {
+            title: "Faturamento",
+            value: `R$ ${monthlyRevenue.toLocaleString('pt-BR')}`,
+            change: "+18%", // Placeholder for trend
+            icon: TrendingUp,
+            description: "Receita mensal estimada",
+        },
+    ];
+
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {kpiData.map((item) => (

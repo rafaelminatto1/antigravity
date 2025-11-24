@@ -1,20 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus, Calendar as CalendarIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 type Task = {
     id: string;
     title: string;
-    tag: string;
-    tagColor: string;
-    assignees: string[];
-    date: string;
+    status: string;
+    priority: string;
+    due_date: string | null;
+    assignee?: {
+        full_name: string;
+        avatar_url: string;
+    };
+    project?: {
+        title: string;
+    };
 };
 
 type Column = {
@@ -23,61 +31,39 @@ type Column = {
     tasks: Task[];
 };
 
-const initialData: Column[] = [
-    {
-        id: "todo",
-        title: "A Fazer",
-        tasks: [
-            {
-                id: "1",
-                title: "Avaliação Inicial - Sra. Maria",
-                tag: "Avaliação",
-                tagColor: "bg-blue-500/10 text-blue-500",
-                assignees: ["https://github.com/shadcn.png"],
-                date: "24 Nov",
-            },
-            {
-                id: "2",
-                title: "Revisar Protocolo Lombar",
-                tag: "Interno",
-                tagColor: "bg-purple-500/10 text-purple-500",
-                assignees: ["https://github.com/shadcn.png"],
-                date: "25 Nov",
-            },
-        ],
-    },
-    {
-        id: "in-progress",
-        title: "Em Andamento",
-        tasks: [
-            {
-                id: "3",
-                title: "Sessão de Fisioterapia - João Silva",
-                tag: "Tratamento",
-                tagColor: "bg-green-500/10 text-green-500",
-                assignees: ["https://github.com/shadcn.png", "https://github.com/shadcn.png"],
-                date: "Hoje",
-            },
-        ],
-    },
-    {
-        id: "done",
-        title: "Concluído",
-        tasks: [
-            {
-                id: "4",
-                title: "Relatório Mensal - Convênio X",
-                tag: "Administrativo",
-                tagColor: "bg-orange-500/10 text-orange-500",
-                assignees: ["https://github.com/shadcn.png"],
-                date: "Ontem",
-            },
-        ],
-    },
-];
+interface KanbanBoardProps {
+    initialTasks: Task[];
+}
 
-export function KanbanBoard() {
-    const [columns] = useState(initialData);
+export function KanbanBoard({ initialTasks }: KanbanBoardProps) {
+    const [columns, setColumns] = useState<Column[]>([
+        { id: "todo", title: "A Fazer", tasks: [] },
+        { id: "in-progress", title: "Em Andamento", tasks: [] },
+        { id: "done", title: "Concluído", tasks: [] },
+    ]);
+
+    useEffect(() => {
+        const groupedTasks = {
+            todo: initialTasks.filter(t => t.status === 'todo'),
+            'in-progress': initialTasks.filter(t => t.status === 'in-progress'),
+            done: initialTasks.filter(t => t.status === 'done'),
+        };
+
+        setColumns([
+            { id: "todo", title: "A Fazer", tasks: groupedTasks.todo },
+            { id: "in-progress", title: "Em Andamento", tasks: groupedTasks['in-progress'] },
+            { id: "done", title: "Concluído", tasks: groupedTasks.done },
+        ]);
+    }, [initialTasks]);
+
+    const getPriorityColor = (priority: string) => {
+        switch (priority) {
+            case 'high': return 'bg-red-500/10 text-red-500';
+            case 'medium': return 'bg-yellow-500/10 text-yellow-500';
+            case 'low': return 'bg-blue-500/10 text-blue-500';
+            default: return 'bg-gray-500/10 text-gray-500';
+        }
+    };
 
     return (
         <div className="flex h-full gap-6 overflow-x-auto pb-4">
@@ -101,8 +87,8 @@ export function KanbanBoard() {
                                 <Card key={task.id} className="cursor-pointer border-none bg-card shadow-sm transition-all hover:shadow-md hover:scale-[1.02]">
                                     <CardHeader className="p-4 pb-2 space-y-0">
                                         <div className="flex items-start justify-between">
-                                            <Badge variant="secondary" className={`${task.tagColor} border-none`}>
-                                                {task.tag}
+                                            <Badge variant="secondary" className={`${getPriorityColor(task.priority)} border-none`}>
+                                                {task.project?.title || 'Geral'}
                                             </Badge>
                                             <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 -mt-2 text-muted-foreground">
                                                 <MoreHorizontal className="h-4 w-4" />
@@ -115,17 +101,17 @@ export function KanbanBoard() {
                                     <CardContent className="p-4 pt-2">
                                         <div className="flex items-center justify-between mt-2">
                                             <div className="flex -space-x-2">
-                                                {task.assignees.map((avatar, i) => (
-                                                    <Avatar key={i} className="h-6 w-6 border-2 border-card">
-                                                        <AvatarImage src={avatar} />
-                                                        <AvatarFallback>U</AvatarFallback>
-                                                    </Avatar>
-                                                ))}
+                                                <Avatar className="h-6 w-6 border-2 border-card">
+                                                    <AvatarImage src={task.assignee?.avatar_url} />
+                                                    <AvatarFallback>{task.assignee?.full_name?.[0] || 'U'}</AvatarFallback>
+                                                </Avatar>
                                             </div>
-                                            <div className="flex items-center text-xs text-muted-foreground">
-                                                <CalendarIcon className="mr-1 h-3 w-3" />
-                                                {task.date}
-                                            </div>
+                                            {task.due_date && (
+                                                <div className="flex items-center text-xs text-muted-foreground">
+                                                    <CalendarIcon className="mr-1 h-3 w-3" />
+                                                    {format(new Date(task.due_date), 'dd MMM', { locale: ptBR })}
+                                                </div>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -107,11 +107,14 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         </div>
 };
 
-export function RichEditor({ content = "" }: { content?: string }) {
+export function RichEditor({ content = "", onChange }: { content?: string, onChange?: (html: string) => void }) {
     const editor = useEditor({
         extensions: [StarterKit],
         content: content || '<p>Comece a escrever seu documento aqui...</p>',
         immediatelyRender: false,
+        onUpdate: ({ editor }) => {
+            onChange?.(editor.getHTML());
+        },
         editorProps: {
             attributes: {
                 class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none dark:prose-invert min-h-[500px] p-4',

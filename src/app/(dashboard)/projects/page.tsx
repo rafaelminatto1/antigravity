@@ -1,8 +1,27 @@
 import { KanbanBoard } from "@/components/kanban/board";
 import { Button } from "@/components/ui/button";
 import { Plus, Filter } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+    const supabase = await createClient();
+
+    const { data: tasks } = await supabase
+        .from('tasks')
+        .select(`
+            *,
+            project:projects(title),
+            assignee:profiles(full_name, avatar_url)
+        `)
+        .order('created_at', { ascending: false });
+
+    // Transform data to match KanbanBoard expectations
+    const formattedTasks = tasks?.map(task => ({
+        ...task,
+        project: task.project, // Keep the object structure
+        assignee: task.assignee
+    })) || [];
+
     return (
         <div className="flex h-[calc(100vh-100px)] flex-col space-y-6">
             <div className="flex items-center justify-between">
@@ -25,7 +44,7 @@ export default function ProjectsPage() {
             </div>
 
             <div className="flex-1 overflow-hidden">
-                <KanbanBoard />
+                <KanbanBoard initialTasks={formattedTasks} />
             </div>
         </div>
     );

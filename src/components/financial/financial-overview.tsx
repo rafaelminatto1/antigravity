@@ -3,23 +3,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const data = [
-    { name: "Jan", receita: 4000, despesa: 2400 },
-    { name: "Fev", receita: 3000, despesa: 1398 },
-    { name: "Mar", receita: 2000, despesa: 9800 },
-    { name: "Abr", receita: 2780, despesa: 3908 },
-    { name: "Mai", receita: 1890, despesa: 4800 },
-    { name: "Jun", receita: 2390, despesa: 3800 },
-    { name: "Jul", receita: 3490, despesa: 4300 },
-];
+interface FinancialData {
+    name: string;
+    receita: number;
+    despesa: number;
+}
 
-export function FinancialOverview() {
+interface FinancialOverviewProps {
+    data: FinancialData[];
+}
+
+export function FinancialOverview({ data }: FinancialOverviewProps) {
     return (
         <Card className="glass-card border-none col-span-4">
             <CardHeader>
                 <CardTitle>Fluxo de Caixa</CardTitle>
                 <CardDescription>
-                    Comparativo de receitas e despesas nos últimos 7 meses.
+                    Comparativo de receitas e despesas nos últimos meses.
                 </CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
