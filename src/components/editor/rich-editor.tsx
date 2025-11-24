@@ -15,7 +15,7 @@ import {
     Heading2
 } from "lucide-react";
 
-import { TemplateSelector } from "./templates";
+
 import { AISuggestions } from "./ai-suggestions";
 
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
@@ -25,7 +25,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 
     return (
         <div className="flex flex-wrap gap-2 border-b bg-muted/30 p-2 backdrop-blur-sm items-center">
-            <TemplateSelector onSelect={(content) => editor.commands.insertContent(content)} />
+
             <AISuggestions onInsert={(content) => editor.commands.insertContent(content)} />
             <div className="w-px h-6 bg-border mx-1" />
             <Button
@@ -105,6 +105,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
                 </Button>
             </div>
         </div>
+    );
 };
 
 export function RichEditor({ content = "", onChange }: { content?: string, onChange?: (html: string) => void }) {
