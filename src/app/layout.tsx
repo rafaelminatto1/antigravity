@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 import { PWAInit } from "@/components/pwa-init";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className={cn(inter.className, "bg-background min-h-screen antialiased overflow-hidden")}>
         <PWAInit />
         {children}
+        <Toaster />
       </body>
     </html>
   );

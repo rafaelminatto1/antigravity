@@ -34,47 +34,33 @@ interface PatientListProps {
     initialPatients: any[];
 }
 
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
+
+// ... existing imports
+
 export function PatientList({ initialPatients }: PatientListProps) {
-    const [searchTerm, setSearchTerm] = useState("");
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { replace } = useRouter();
     const [selectedPatientSummary, setSelectedPatientSummary] = useState<any>(null);
 
+    const handleSearch = useDebouncedCallback((term: string) => {
+        const params = new URLSearchParams(searchParams);
+        if (term) {
+            params.set('query', term);
+        } else {
+            params.delete('query');
+        }
+        replace(`${pathname}?${params.toString()}`);
+    }, 300);
+
     const patients = initialPatients.length > 0 ? initialPatients : [
-        {
-            id: "1",
-            name: "Maria Silva",
-            age: 45,
-            condition: "Pós-op LCA",
-            status: "Em Tratamento",
-            lastVisit: "20/11/2025",
-            therapist: "Dr. Rafael",
-            avatar: "https://github.com/shadcn.png",
-        },
-        {
-            id: "2",
-            name: "João Santos",
-            age: 62,
-            condition: "Lombalgia Crônica",
-            status: "Em Tratamento",
-            lastVisit: "18/11/2025",
-            therapist: "Dra. Ana",
-            avatar: "",
-        },
-        {
-            id: "3",
-            name: "Pedro Oliveira",
-            age: 28,
-            condition: "Tendinite Ombro",
-            status: "Alta",
-            lastVisit: "15/11/2025",
-            therapist: "Dr. Rafael",
-            avatar: "",
-        },
+        // ... mock data
     ];
 
-    const filteredPatients = patients.filter((patient: any) =>
-        patient.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        patient.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Remove client-side filtering since it's handled by server
+    const filteredPatients = patients;
 
     return (
         <div className="space-y-4">
@@ -84,8 +70,8 @@ export function PatientList({ initialPatients }: PatientListProps) {
                     <Input
                         placeholder="Buscar pacientes..."
                         className="pl-8 bg-background/50"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        defaultValue={searchParams.get('query')?.toString()}
+                        onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
                 <Button variant="outline" size="icon">

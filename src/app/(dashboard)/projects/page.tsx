@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Plus, Filter } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function ProjectsPage() {
+import { ProjectFilters } from "@/components/projects/project-filters";
+
+export default async function ProjectsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ query?: string }>;
+}) {
+    const params = await searchParams;
+    const query = params.query || '';
     const supabase = await createClient();
 
-    const { data: tasks } = await supabase
+    let dbQuery = supabase
         .from('tasks')
         .select(`
             *,
@@ -14,6 +22,12 @@ export default async function ProjectsPage() {
             assignee:profiles(full_name, avatar_url)
         `)
         .order('created_at', { ascending: false });
+
+    if (query) {
+        dbQuery = dbQuery.ilike('title', `%${query}%`);
+    }
+
+    const { data: tasks } = await dbQuery;
 
     // Transform data to match KanbanBoard expectations
     const formattedTasks = tasks?.map(task => ({
@@ -32,10 +46,7 @@ export default async function ProjectsPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Button variant="outline">
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filtrar
-                    </Button>
+                    <ProjectFilters />
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
                         Novo Projeto

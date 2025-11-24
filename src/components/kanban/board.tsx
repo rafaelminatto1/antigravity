@@ -35,12 +35,19 @@ interface KanbanBoardProps {
     initialTasks: Task[];
 }
 
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+
+// ... existing imports
+
 export function KanbanBoard({ initialTasks }: KanbanBoardProps) {
     const [columns, setColumns] = useState<Column[]>([
         { id: "todo", title: "A Fazer", tasks: [] },
         { id: "in-progress", title: "Em Andamento", tasks: [] },
         { id: "done", title: "Concluído", tasks: [] },
     ]);
+    const supabase = createClient();
+    const router = useRouter();
 
     useEffect(() => {
         const groupedTasks = {
@@ -55,6 +62,31 @@ export function KanbanBoard({ initialTasks }: KanbanBoardProps) {
             { id: "done", title: "Concluído", tasks: groupedTasks.done },
         ]);
     }, [initialTasks]);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('kanban-board-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'tasks',
+                },
+                (payload) => {
+                    console.log('Change received!', payload);
+                    router.refresh();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [supabase, router]);
+
+    // ... rest of the component
+
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {

@@ -1,0 +1,33 @@
+-- Enable Storage extension if not enabled (usually enabled by default)
+
+-- Create 'avatars' bucket
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+-- Create 'attachments' bucket
+insert into storage.buckets (id, name, public)
+values ('attachments', 'attachments', true)
+on conflict (id) do nothing;
+
+-- Policies for 'avatars'
+create policy "Avatar images are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
+
+create policy "Authenticated users can upload avatars."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' and auth.role() = 'authenticated' );
+
+create policy "Users can update their own avatars."
+  on storage.objects for update
+  using ( bucket_id = 'avatars' and auth.uid() = owner );
+
+-- Policies for 'attachments'
+create policy "Attachments are accessible by authenticated users."
+  on storage.objects for select
+  using ( bucket_id = 'attachments' and auth.role() = 'authenticated' );
+
+create policy "Authenticated users can upload attachments."
+  on storage.objects for insert
+  with check ( bucket_id = 'attachments' and auth.role() = 'authenticated' );

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfileSettings } from "@/components/settings/profile-settings";
 
 export default function SettingsPage() {
     return (
@@ -24,32 +25,7 @@ export default function SettingsPage() {
                 </TabsList>
 
                 <TabsContent value="profile" className="space-y-4">
-                    <Card className="glass-card border-none">
-                        <CardHeader>
-                            <CardTitle>Informações Pessoais</CardTitle>
-                            <CardDescription>Atualize seus dados cadastrais.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <Avatar className="h-20 w-20">
-                                    <AvatarImage src="https://github.com/shadcn.png" />
-                                    <AvatarFallback>DR</AvatarFallback>
-                                </Avatar>
-                                <Button variant="outline">Alterar Foto</Button>
-                            </div>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Nome Completo</Label>
-                                    <Input id="name" defaultValue="Dr. Rafael" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input id="email" defaultValue="rafael@manusfisio.com" />
-                                </div>
-                            </div>
-                            <Button>Salvar Alterações</Button>
-                        </CardContent>
-                    </Card>
+                    <ProfileSettings />
                 </TabsContent>
 
                 <TabsContent value="notifications">

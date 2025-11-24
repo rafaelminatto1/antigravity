@@ -3,9 +3,22 @@ import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function PatientsPage() {
+export default async function PatientsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ query?: string }>;
+}) {
+    const params = await searchParams;
+    const query = params.query || '';
     const supabase = await createClient();
-    const { data: patients } = await supabase.from('patients').select('*');
+
+    let dbQuery = supabase.from('patients').select('*');
+
+    if (query) {
+        dbQuery = dbQuery.ilike('full_name', `%${query}%`);
+    }
+
+    const { data: patients } = await dbQuery;
 
     return (
         <div className="space-y-8">
