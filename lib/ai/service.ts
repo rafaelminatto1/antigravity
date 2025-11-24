@@ -5,6 +5,11 @@ export interface AITreatmentSuggestion {
     frequency: string;
 }
 
+export interface AISummary {
+    summary: string;
+    keyPoints: string[];
+}
+
 export const aiService = {
     async getTreatmentSuggestions(_case: string): Promise<AITreatmentSuggestion[]> {
         // Mock data – replace with real AI integration later
@@ -22,5 +27,17 @@ export const aiService = {
                 frequency: '3x por semana',
             },
         ];
+    },
+
+    async summarizePatientHistory(_patientId: string): Promise<AISummary> {
+        // Simple mock summary — replace with real AI integration
+        return {
+            summary: 'Paciente com histórico de dores intermitentes; recomenda-se reavaliação da força muscular e programa de mobilidade.',
+            keyPoints: [
+                'Dor intermitente na região afetada',
+                'Limitação funcional leve',
+                'Recomendado programa domiciliar de mobilidade',
+            ],
+        };
     },
 };

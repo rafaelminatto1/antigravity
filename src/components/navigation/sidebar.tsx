@@ -26,7 +26,7 @@ const navItems = [
   { href: "/projects", label: "Projetos", icon: KanbanSquare },
   { href: "/team", label: "Equipe", icon: Users },
   { href: "/financial", label: "Financeiro", icon: DollarSign },
-  { href: "/calendar", label: "Agenda", icon: Calendar },
+  { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/patients", label: "Pacientes", icon: Users },
   { href: "/settings", label: "Configurações", icon: Settings },
 ];

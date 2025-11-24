@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Manus Fisio - Gestão Clínica Inteligente",
@@ -12,6 +9,7 @@ export const metadata: Metadata = {
 
 import { PWAInit } from "@/components/pwa-init";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/lib/providers/QueryProvider";
 
 export default function RootLayout({
   children,
@@ -20,10 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className={cn(inter.className, "bg-background min-h-screen antialiased overflow-hidden")}>
-        <PWAInit />
-        {children}
-        <Toaster />
+      <body className={cn("bg-background min-h-screen antialiased overflow-hidden")}>
+        <QueryProvider>
+          <PWAInit />
+          {children}
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );

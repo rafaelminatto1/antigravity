@@ -36,8 +36,11 @@ export default function LoginPage() {
             router.refresh();
         } catch (error: any) {
             console.error("Login error:", error);
-            // You might want to add a toast notification here
-            alert("Erro ao fazer login: " + error.message);
+            toast.error(
+                error.message === "Invalid login credentials" 
+                    ? "Email ou senha incorretos"
+                    : error.message || "Erro ao fazer login"
+            );
         } finally {
             setLoading(false);
         }

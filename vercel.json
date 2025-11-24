@@ -1,0 +1,21 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/appointment-reminders",
+      "schedule": "0 9,17 * * *"
+    },
+    {
+      "path": "/api/cron/check-waitlist",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-old-data",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/send-daily-reports",
+      "schedule": "0 8 * * 1"
+    }
+  ]
+}
+
