@@ -1,0 +1,47 @@
+
+> web-app@0.1.0 build
+> next build
+
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\rafal\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\package-lock.json
+
+   Ôû▓ Next.js 16.0.3 (Turbopack)
+
+   Creating an optimized production build ...
+Error: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at onInvalidCandidate (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:21:1314)]
+    [at Te (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:16:36364)]
+    [at C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:21:355]
+    [at Tr (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:3:1718)]
+    [at _ (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:3:1377)]
+    [at Se (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:21:172)]
+    [at ln (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:38:294)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async sn (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\tailwindcss\dist\lib.js:38:631)]
+    [at async Qr (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\@tailwindcss\node\dist\index.js:10:3385)]
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./OneDrive/Documentos/antigravity/minatto/web-app/src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    at Input.error (OneDrive/Documentos/antigravity/minatto/web-app/node_modules/postcss/lib/input.js:135:16) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\dd35d_853c04f5._.js:4651:22]
+    at Root.error (OneDrive/Documentos/antigravity/minatto/web-app/node_modules/postcss/lib/node.js:146:32) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\dd35d_853c04f5._.js:928:38]
+    [at Object.Once (C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\node_modules\@tailwindcss\postcss\dist\index.js:10:6912)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    at async LazyResult.runAsync (OneDrive/Documentos/antigravity/minatto/web-app/node_modules/postcss/lib/lazy-result.js:293:11) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\dd35d_853c04f5._.js:6206:21]
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\[root-of-the-server]__b9ecf6df._.js:146:36]
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\[root-of-the-server]__efdf2cc6._.js:443:31]
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Documentos/antigravity/minatto/web-app/src/app/globals.css [Client Component Browser]
+    ./OneDrive/Documentos/antigravity/minatto/web-app/src/app/layout.tsx [Server Component]
+
+
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\[root-of-the-server]__b9ecf6df._.js:146:36])
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [C:\Users\rafal\OneDrive\Documentos\antigravity\minatto\web-app\.next\build\chunks\[root-of-the-server]__efdf2cc6._.js:443:31])
