@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../trigger.config.ts"],
+  "sourcesContent": ["import type { TriggerConfig } from \"@trigger.dev/sdk/v3\";\n\nexport default {\n  // ID do projeto no Trigger.dev (projectRef)\n  // Criado automaticamente: proj_rrifzwqeavqexqyedenv\n  project: process.env.TRIGGER_PROJECT_ID || \"proj_rrifzwqeavqexqyedenv\",\n  \n  // Diretório onde os arquivos de tasks estão localizados\n  dirs: [\"./src/trigger\"],\n  \n  // Duração máxima para execução de tasks (em segundos)\n  // Obrigatório na v4.1.2+, mínimo de 5 segundos\n  maxDuration: 300, // 5 minutos (300 segundos)\n  \n  // Configurações de build\n  build: {},\n} satisfies TriggerConfig;\n\nexport const resolveEnvVars = undefined;"],
+  "mappings": ";;;;;AAAA;AAEA,IAAO,yBAAQ;AAAA;AAAA;AAAA,EAGb,SAAS,QAAQ,IAAI,sBAAsB;AAAA;AAAA,EAG3C,MAAM,CAAC,eAAe;AAAA;AAAA;AAAA,EAItB,aAAa;AAAA;AAAA;AAAA,EAGb,OAAO,CAAC;AACV;AAEO,IAAM,iBAAiB;",
+  "names": []
+}

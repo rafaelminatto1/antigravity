@@ -8,8 +8,10 @@ export const metadata: Metadata = {
 };
 
 import { PWAInit } from "@/components/pwa-init";
+import { SentryInit } from "@/components/sentry-init";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -20,9 +22,11 @@ export default function RootLayout({
     <html lang="pt-BR" className="dark">
       <body className={cn("bg-background min-h-screen antialiased overflow-hidden")}>
         <QueryProvider>
+          <SentryInit />
           <PWAInit />
           {children}
           <Toaster />
+          <Analytics />
         </QueryProvider>
       </body>
     </html>

@@ -102,15 +102,11 @@ export function CalendarView({
   }
 
   return (
-    <div className="bg-card rounded-lg border p-4">
+    <div className="h-full w-full p-4">
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={getViewName()}
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-        }}
+        headerToolbar={false}
         locale="pt-br"
         events={events}
         eventClick={handleEventClick}
@@ -144,12 +140,37 @@ export function CalendarView({
         eventContent={(eventInfo) => {
           const statusLabel = eventInfo.event.extendedProps.statusLabel;
           const therapist = eventInfo.event.extendedProps.therapist;
+          const startTime = eventInfo.timeText?.split(' - ')[0] || '';
+          const endTime = eventInfo.timeText?.split(' - ')[1] || '';
           
           return (
-            <div className="p-1 text-xs">
-              <div className="font-semibold truncate">{eventInfo.event.title}</div>
-              <div className="text-muted-foreground truncate">{therapist}</div>
-              <div className="text-xs opacity-75">{statusLabel}</div>
+            <div className="p-2 h-full flex flex-col justify-between">
+              <div className="flex-1">
+                <div className="font-bold text-sm mb-1 truncate" style={{ color: 'white' }}>
+                  {eventInfo.event.title}
+                </div>
+                {therapist && therapist !== 'N/A' && (
+                  <div className="text-xs mb-1 truncate opacity-90" style={{ color: 'white' }}>
+                    {therapist}
+                  </div>
+                )}
+                {(startTime || endTime) && (
+                  <div className="text-xs font-medium mb-1 opacity-90" style={{ color: 'white' }}>
+                    {startTime}{endTime ? ` - ${endTime}` : ''}
+                  </div>
+                )}
+              </div>
+              <div className="mt-auto">
+                <span 
+                  className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold"
+                  style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                    color: 'white'
+                  }}
+                >
+                  {statusLabel}
+                </span>
+              </div>
             </div>
           );
         }}

@@ -6,7 +6,7 @@
 -- ============================================================================
 
 -- Habilitar extensões necessárias
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS "pg_trgm"; -- Para busca fuzzy
 CREATE EXTENSION IF NOT EXISTS "pgcrypto"; -- Para criptografia
 -- Nota: pgvector será adicionado separadamente se necessário
@@ -15,10 +15,29 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto"; -- Para criptografia
 -- TIPOS E ENUMS
 -- ============================================================================
 
-CREATE TYPE user_role AS ENUM ('admin', 'physiotherapist', 'receptionist', 'patient');
-CREATE TYPE appointment_status AS ENUM ('scheduled', 'confirmed', 'completed', 'canceled', 'no_show');
-CREATE TYPE waitlist_priority AS ENUM ('urgent', 'high', 'normal');
-CREATE TYPE waitlist_status AS ENUM ('waiting', 'notified', 'accepted', 'expired', 'cancelled');
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('admin', 'physiotherapist', 'receptionist', 'patient');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE appointment_status AS ENUM ('scheduled', 'confirmed', 'completed', 'canceled', 'no_show');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE waitlist_priority AS ENUM ('urgent', 'high', 'normal');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE waitlist_status AS ENUM ('waiting', 'notified', 'accepted', 'expired', 'cancelled');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- ============================================================================
 -- TABELAS PRINCIPAIS
@@ -26,7 +45,7 @@ CREATE TYPE waitlist_status AS ENUM ('waiting', 'notified', 'accepted', 'expired
 
 -- Organizations (Multi-tenant)
 CREATE TABLE IF NOT EXISTS organizations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   cnpj TEXT UNIQUE,
@@ -37,46 +56,107 @@ CREATE TABLE IF NOT EXISTS organizations (
 );
 
 -- Users (estendendo profiles existente)
--- Adicionar campos ao profiles se necessário
+-- Criar tabela profiles se não existir (sem foreign key inicialmente)
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT,
+  avatar_url TEXT,
+  org_id UUID,
+  role user_role DEFAULT 'patient',
+  phone TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Adicionar foreign key para org_id após organizations ser criada
 DO $$ 
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'org_id') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'organizations')
+    AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles')
+    AND NOT EXISTS (
+      SELECT 1 FROM information_schema.table_constraints 
+      WHERE table_name = 'profiles' 
+      AND constraint_name LIKE '%org_id%'
+    ) THEN
+    ALTER TABLE profiles 
+    ADD CONSTRAINT profiles_org_id_fkey 
+    FOREIGN KEY (org_id) REFERENCES organizations(id);
+  END IF;
+END $$;
+
+-- Adicionar campos ao profiles se a tabela já existir (para casos de atualização)
+DO $$ 
+BEGIN
+  -- Adicionar org_id se não existir
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles')
+    AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'org_id') THEN
     ALTER TABLE profiles ADD COLUMN org_id UUID REFERENCES organizations(id);
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'role') THEN
+  
+  -- Adicionar role se não existir
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles')
+    AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'role') THEN
     ALTER TABLE profiles ADD COLUMN role user_role DEFAULT 'patient';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'phone') THEN
+  
+  -- Adicionar phone se não existir
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles')
+    AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'phone') THEN
     ALTER TABLE profiles ADD COLUMN phone TEXT;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'metadata') THEN
+  
+  -- Adicionar metadata se não existir
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles')
+    AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'metadata') THEN
     ALTER TABLE profiles ADD COLUMN metadata JSONB DEFAULT '{}';
   END IF;
 END $$;
 
--- Patients (atualizar tabela existente)
+-- Patients (criar tabela se não existir)
+CREATE TABLE IF NOT EXISTS patients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  org_id UUID REFERENCES organizations(id),
+  full_name TEXT,
+  email TEXT,
+  phone TEXT,
+  cpf TEXT,
+  birth_date DATE,
+  address TEXT,
+  emergency_contact JSONB,
+  medical_history JSONB DEFAULT '{}',
+  search_vector tsvector,
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Adicionar colunas se a tabela já existir (para casos de atualização)
 DO $$ 
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'org_id') THEN
-    ALTER TABLE patients ADD COLUMN org_id UUID REFERENCES organizations(id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'user_id') THEN
-    ALTER TABLE patients ADD COLUMN user_id UUID REFERENCES profiles(id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'cpf') THEN
-    ALTER TABLE patients ADD COLUMN cpf TEXT;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'birth_date') THEN
-    ALTER TABLE patients ADD COLUMN birth_date DATE;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'emergency_contact') THEN
-    ALTER TABLE patients ADD COLUMN emergency_contact JSONB;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'medical_history') THEN
-    ALTER TABLE patients ADD COLUMN medical_history JSONB DEFAULT '{}';
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'search_vector') THEN
-    ALTER TABLE patients ADD COLUMN search_vector tsvector;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'patients') THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'org_id') THEN
+      ALTER TABLE patients ADD COLUMN org_id UUID REFERENCES organizations(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'user_id') THEN
+      ALTER TABLE patients ADD COLUMN user_id UUID REFERENCES profiles(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'cpf') THEN
+      ALTER TABLE patients ADD COLUMN cpf TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'birth_date') THEN
+      ALTER TABLE patients ADD COLUMN birth_date DATE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'emergency_contact') THEN
+      ALTER TABLE patients ADD COLUMN emergency_contact JSONB;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'medical_history') THEN
+      ALTER TABLE patients ADD COLUMN medical_history JSONB DEFAULT '{}';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'patients' AND column_name = 'search_vector') THEN
+      ALTER TABLE patients ADD COLUMN search_vector tsvector;
+    END IF;
   END IF;
 END $$;
 
@@ -85,38 +165,60 @@ CREATE INDEX IF NOT EXISTS idx_patients_search_vector ON patients USING gin(sear
 CREATE INDEX IF NOT EXISTS idx_patients_org_id ON patients(org_id);
 CREATE INDEX IF NOT EXISTS idx_patients_user_id ON patients(user_id);
 
--- Appointments (atualizar tabela existente)
+-- Appointments (criar tabela se não existir)
+CREATE TABLE IF NOT EXISTS appointments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID REFERENCES organizations(id),
+  patient_id UUID REFERENCES patients(id),
+  therapist_id UUID REFERENCES profiles(id),
+  start_time TIMESTAMPTZ NOT NULL,
+  end_time TIMESTAMPTZ NOT NULL,
+  status appointment_status DEFAULT 'scheduled',
+  notes TEXT,
+  duration_minutes INT DEFAULT 60,
+  confirmed_at TIMESTAMPTZ,
+  reminder_sent BOOLEAN DEFAULT FALSE,
+  recurrence_pattern JSONB,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Adicionar colunas se a tabela já existir (para casos de atualização)
 DO $$ 
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'org_id') THEN
-    ALTER TABLE appointments ADD COLUMN org_id UUID REFERENCES organizations(id);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'duration_minutes') THEN
-    ALTER TABLE appointments ADD COLUMN duration_minutes INT DEFAULT 60;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'confirmed_at') THEN
-    ALTER TABLE appointments ADD COLUMN confirmed_at TIMESTAMPTZ;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'reminder_sent') THEN
-    ALTER TABLE appointments ADD COLUMN reminder_sent BOOLEAN DEFAULT FALSE;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'recurrence_pattern') THEN
-    ALTER TABLE appointments ADD COLUMN recurrence_pattern JSONB;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'metadata') THEN
-    ALTER TABLE appointments ADD COLUMN metadata JSONB DEFAULT '{}';
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'appointments') THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'org_id') THEN
+      ALTER TABLE appointments ADD COLUMN org_id UUID REFERENCES organizations(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'duration_minutes') THEN
+      ALTER TABLE appointments ADD COLUMN duration_minutes INT DEFAULT 60;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'confirmed_at') THEN
+      ALTER TABLE appointments ADD COLUMN confirmed_at TIMESTAMPTZ;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'reminder_sent') THEN
+      ALTER TABLE appointments ADD COLUMN reminder_sent BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'recurrence_pattern') THEN
+      ALTER TABLE appointments ADD COLUMN recurrence_pattern JSONB;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'appointments' AND column_name = 'metadata') THEN
+      ALTER TABLE appointments ADD COLUMN metadata JSONB DEFAULT '{}';
+    END IF;
   END IF;
 END $$;
 
--- Atualizar status para usar enum (apenas se a coluna ainda não for do tipo enum)
+-- Atualizar status para usar enum (apenas se a tabela existir e a coluna ainda não for do tipo enum)
 DO $$ 
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'appointments' 
-    AND column_name = 'status' 
-    AND data_type != 'USER-DEFINED'
-  ) THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'appointments')
+    AND EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_name = 'appointments' 
+      AND column_name = 'status' 
+      AND data_type != 'USER-DEFINED'
+    ) THEN
     ALTER TABLE appointments DROP CONSTRAINT IF EXISTS appointments_status_check;
     -- Converter valores existentes para o enum
     ALTER TABLE appointments ALTER COLUMN status TYPE appointment_status 
@@ -146,7 +248,7 @@ CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
 
 -- Sessions (Evoluções SOAP)
 CREATE TABLE IF NOT EXISTS sessions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   appointment_id UUID UNIQUE REFERENCES appointments(id) ON DELETE CASCADE,
   org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
@@ -173,7 +275,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_session_date ON sessions(session_date);
 
 -- Body Pain Maps (Mapa de Dor)
 CREATE TABLE IF NOT EXISTS body_pain_maps (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
   patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
   points JSONB NOT NULL, -- [{x, y, view: 'front'|'back', intensity: 0-10, notes}]
@@ -186,7 +288,7 @@ CREATE INDEX IF NOT EXISTS idx_body_pain_maps_patient_id ON body_pain_maps(patie
 
 -- Waitlist (Lista de Espera)
 CREATE TABLE IF NOT EXISTS waitlist (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
   desired_date DATE,
@@ -207,7 +309,7 @@ CREATE INDEX IF NOT EXISTS idx_waitlist_expires_at ON waitlist(expires_at);
 
 -- Session Templates (Templates de Condutas)
 CREATE TABLE IF NOT EXISTS session_templates (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   specialty TEXT,
@@ -226,7 +328,7 @@ CREATE INDEX IF NOT EXISTS idx_session_templates_is_public ON session_templates(
 
 -- Treatment Procedures (Biblioteca de Procedimentos)
 CREATE TABLE IF NOT EXISTS treatment_procedures (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   category TEXT NOT NULL,
@@ -249,7 +351,7 @@ CREATE INDEX IF NOT EXISTS idx_treatment_procedures_tags ON treatment_procedures
 
 -- Notifications (Sistema de Notificações)
 CREATE TABLE IF NOT EXISTS notifications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type TEXT NOT NULL,
   title TEXT NOT NULL,
@@ -266,7 +368,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created
 
 -- Analytics Events (Métricas e Analytics)
 CREATE TABLE IF NOT EXISTS analytics_events (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   event_name TEXT NOT NULL,
   user_id UUID REFERENCES profiles(id),

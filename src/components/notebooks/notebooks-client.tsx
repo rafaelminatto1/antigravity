@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,15 +69,26 @@ export function NotebooksClient({ notebooks: initialNotebooks, activeNotebook: i
                 body: JSON.stringify(newNotebook),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setNotebooks([data.data, ...notebooks]);
-                setNewNotebook({ title: '', content: '' });
-                setIsDialogOpen(false);
-                router.push(`/notebooks?id=${data.data.id}`);
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                if (data.data) {
+                    toast.success('Notebook criado com sucesso!');
+                    setNotebooks([data.data, ...notebooks]);
+                    setNewNotebook({ title: '', content: '' });
+                    setIsDialogOpen(false);
+                    router.push(`/notebooks?id=${data.data.id}`);
+                } else {
+                    console.error('Error: API returned success but no data:', data);
+                    toast.error('Erro: Notebook criado mas dados não retornados');
+                }
+            } else {
+                console.error('Error creating notebook:', data);
+                toast.error(`Erro ao criar notebook: ${data?.error || 'Erro desconhecido'}`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating notebook:', error);
+            toast.error(`Erro ao criar notebook: ${error?.message || 'Erro de conexão'}`);
         } finally {
             setIsCreating(false);
         }

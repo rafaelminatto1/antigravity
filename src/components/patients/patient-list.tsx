@@ -22,6 +22,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface PatientListProps {
     initialPatients: any[];
@@ -29,6 +30,7 @@ interface PatientListProps {
 
 export function PatientList({ initialPatients }: PatientListProps) {
     const [searchTerm, setSearchTerm] = useState("");
+    const router = useRouter();
 
     // If no patients from DB, use mock data for display purposes if needed, 
     // but ideally we want to show empty state or the real data.
@@ -138,11 +140,11 @@ export function PatientList({ initialPatients }: PatientListProps) {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                            <DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => router.push(`/patients/${patient.id}/prontuario`)}>
                                                 <FileText className="mr-2 h-4 w-4" />
                                                 Ver Prontuário
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => router.push(`/patients/${patient.id}/evolution`)}>
                                                 <Activity className="mr-2 h-4 w-4" />
                                                 Nova Evolução
                                             </DropdownMenuItem>

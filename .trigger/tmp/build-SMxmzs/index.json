@@ -1,0 +1,19 @@
+{
+  "configPath": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\OneDrive\\Documentos\\antigravity\\trigger.config.mjs",
+  "tasks": [
+    {
+      "id": "example-task",
+      "maxDuration": 300,
+      "filePath": "src/trigger/example.ts",
+      "entryPoint": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\OneDrive\\Documentos\\antigravity\\src\\trigger\\example.mjs"
+    }
+  ],
+  "queues": [],
+  "workerEntryPoint": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs",
+  "runtime": "node",
+  "runtimeVersion": "24.11.1",
+  "customConditions": [],
+  "timings": {
+    "src/trigger/example.ts": 105.8663
+  }
+}

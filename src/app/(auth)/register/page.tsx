@@ -40,7 +40,7 @@ export default function RegisterPage() {
             }
 
             alert("Cadastro realizado com sucesso! Verifique seu email para confirmar.");
-            router.push("/login");
+            router.push("/auth/login");
         } catch (error: any) {
             console.error("Register error:", error);
             alert("Erro ao cadastrar: " + error.message);

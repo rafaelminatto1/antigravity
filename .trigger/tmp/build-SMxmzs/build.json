@@ -1,0 +1,56 @@
+{
+  "contentHash": "d7f4a7aca35aade68ffcb28a3008d3b1",
+  "runtime": "node",
+  "environment": "dev",
+  "packageVersion": "4.1.2",
+  "cliPackageVersion": "4.1.2",
+  "target": "dev",
+  "files": [
+    {
+      "entry": "src/trigger/example.ts",
+      "out": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\OneDrive\\Documentos\\antigravity\\src\\trigger\\example.mjs"
+    }
+  ],
+  "sources": {
+    "src/trigger/example.ts": {
+      "contents": "eJxtUrFu2zAU3AXoHy6abEOVh24K3AZoO3RoOiTo/ky+KERMUiUpV4Gjr+lQpGs/QT9WkJHsushCiPfe3bt7lNKtdQEHBPIPGHDnrEZxFZxqGnaV5P3ay4f1/m1xmWd5tl6t8gwr3MZuyeCedbuzkBa3J0pqSccnHwjjMzpNLxO80u2OPb53DMnaGh8cQVhtIZwil7o8zJlelbS+WTH+RmslQyrfkiMHjvpJmIKj/fjsoxVJ/n5ryUnYDntFEOMfqRqbdNZ5xn0KLeJ0cE/RUkq0SVqLQ54BStYopuKbCBdlhF1napB/NAKLlh53lmSNAzR7Tw2/r+GDU6bBgA0OQ4kDROgxLLF5h6SLae7EwAaTTDUjT08ortncx6VpNhHTuLPOsFCS4kNElZOW3XG1s82iSBm4Z9EFkmmr8J1g7+1Fsbx8hfBlVncseKsk1UU5G3uV8MGawH2IK34ZNP4af9rImrIBFALrNtQxdzVdyrmYthcLrjNHkM1eOWs0m4n1DzA1Dcuz1I5D58xppu9EjFkjuI6PulOQev44FoLS8cfRbQ3DP/CRAi+WVbCfb77epNdbLMv/4lx3esvuLFRlEjY7TAaHMs+S1zz7CxIWDqg=",
+      "contentHash": "4dd199267871bebd9a19ceafc4820cc6"
+    },
+    "trigger.config.ts": {
+      "contents": "eJx1kr2K20AQx3uD32FQ5RAjOXGuUZqAfRxOc8G4O4KZ047E5LQ79u5K0X34YUKKVKlCnkAvFnYlH7hIt8zO7z//+WB9EOvBPx4InmFnuarIrsSUXMEJSisakk9+CKeK2syph6xdJh+nk+mEuggrKrGpPTxPJwBZBps1KIGDlW/kBYycZQMPsxgv/JbKN2P+yjIqAWy8aPRcoCbjKY8Ke2u5fPp+JGyP1B0fSZFpAzfKxKyCnEvJtOluu7m5ud7uv2xvP1+vdvvNGl5eIPmvUDIPUqONNVvy/R/LAmIUgThAe2y4FQeKwKN7cEDO9z8Faimw5idU4gKt2Loc7pI0c7bIxnElXy/UG4v9r8Dq/kfHGuGAFoE6Kpoh/lpjRhocVY1R4s4zur23XOFozyC0H9J36fu3c9D9b8M60levVIA0dqGmZzE5LBeLeZC5As2m8eJgtlwsLquctxGXP7j9S7H1+4ZrFb7jIx8WDUCdJ2uwzuFuaPU0n05O4NCzK5nc5TnFi/kHznrQ2Q==",
+      "contentHash": "ec11d6d589eb1613514782b65e2c67a8"
+    },
+    "tsconfig.json": {
+      "contents": "eJxtUstOwzAQvOcrVj5GNAEuSD0hoR6oqJBAnFCFnHjVmvole1OKqv47shO3JHCKZsYz2Vn7WACw1monFfpnR9KawOZwLAAAWMMDvnnF5sAqdtVzxP0GKVKL19vrm7vMK9mwObwnAMCE1YPSg0oSet4ovLAYDB6IJbgeUrhS9msZRyDf4UCGnXRPsnnYYrubKORlS2PO2IWWEw7DyopO4aMh9NaNRZ2k2GiYaMS/YLCqi4uJJ5rOCIU+H/FR3OMyWLPKKb+SZbCKE4pem7T6DIeY6JG3NIsgm0zrUaMhrsYGp7qNTNeTt3wcvrE116nCZaUAp9FqHaft5W4B2H1d/soCYFUdfFuX2b4ucsgpRsTBVCfw7En/mqHZV6KikMcvy7r8C8/tqmiq6dthqCdHe0ng/n85QU0hjpc6MTxMB7ICP/Sw7PxEOsfjO0624vQD4KTEqA==",
+      "contentHash": "93c13c3e0e8e375956eb69a80565b8d9"
+    },
+    "package.json": {
+      "contents": "eJyNlsly2zAMQO/5Co2nx5KW5CXLqYd+R2dgEpFZ06QKQnbcTv69Q4mWmNRKc7IEPAEgNvrPXVEsHBxx8VQszrgT0LaLr1F4QgrGuygvZSXLQdqSOQFHmqnDXhQUmZbD4qn4c1cURbHQeIpfOXzhIj5/HcS7zlg9Koa3pAoMxKNqeEsqa1yvwdA/JSmTaRqkp+QqvUqNp97jXVG89rFpbNFpdMpgFuA37bQ4GF4qT/3Bf2zlSlZX46M6eGLY2QGpSlmmLORMx8YaHswvfqxkLeuRee6sVWDRaaDcVyWrx9uQhktDRv+XM46RQHEq0IcsISj+L8XmiHOuG+8bi8sGHRKwOaEA03OlrKssJ3vvD8+ejkvC4G1soJ7avEkKgTYvojNDXAIsEgttwPpmyHP0vZnFT8BAE1jNgWqP6rDzLwldydUc+Wnfmnyr/dmJI7qu5+vIb+d4Czu0I/cwh7W+9SekTwTQkm8IQxjRWZtBkbdWACEkuJZVOUujxdQitazl7IECtkDAnj4RgDV6PNPqA5PW8xjhepY6G1b7kZu1xrCbklNNFQ/omC7LuF1+hus01/dZ64auhR0EXIZAqbVvq9ODSHZq+bDOOAYXGNQhxfOrQ7qkGXgs8wqwaRnabDZXsspHKen7VYgUN81Natp7y6APEVnLaho2ZSEEcQIy4BQK6HjvyfBlPGE1keFlaumrVAOjeHbDUdcyc207ZTSKKf5SbjZZJmKqo7zaynIavSgVvMdjWpelXE/FHG1Vj7KeLKXZg4tojTqknnqMeajeIf4493VcTCJupv7je7nd5h+rPRBf9/d60gTvXPJXy1Lej5cPGHs2TosjUoPjd6PPLqDQuPOdU9nVMZ7zt9djPqce/d0FBqdTs5TyIb/ETt9v32PXSFQIy9YHVmk3rG92yHgBv+mRb3xpMSyd10OwdflOM9U4uxIy1TXxmTpd1n2l3sqE8u7ZNOJ2f7QWLmcyzf66EzZZoa6jlwqyeZCb9xX55/x8FuDMMbaxGvdmVqr+GP3/lyHxU9LjSiaj36b7n3EbNFNRv8TfXvYaLd29/gXri4pS",
+      "contentHash": "84defd7aadd9b265362133c69982380a"
+    }
+  },
+  "externals": [
+    {
+      "name": "import-in-the-middle",
+      "version": "1.11.0"
+    }
+  ],
+  "config": {
+    "project": "proj_rrifzwqeavqexqyedenv",
+    "dirs": [
+      "./src/trigger"
+    ]
+  },
+  "outputPath": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs",
+  "indexWorkerEntryPoint": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-index-worker.mjs",
+  "runWorkerEntryPoint": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs",
+  "configPath": "C:\\Users\\rafal\\OneDrive\\Documentos\\antigravity\\.trigger\\tmp\\build-SMxmzs\\OneDrive\\Documentos\\antigravity\\trigger.config.mjs",
+  "customConditions": [],
+  "deploy": {
+    "env": {}
+  },
+  "build": {},
+  "otelImportHook": {
+    "include": []
+  }
+}

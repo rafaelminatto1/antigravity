@@ -32,7 +32,7 @@ export default function LoginPage() {
                 throw error;
             }
 
-            router.push("/");
+            router.push("/dashboard");
             router.refresh();
         } catch (error: any) {
             console.error("Login error:", error);
@@ -96,7 +96,7 @@ export default function LoginPage() {
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
                         Não tem uma conta?{" "}
-                        <Link href="/register" className="text-primary hover:underline font-medium">
+                        <Link href="/auth/register" className="text-primary hover:underline font-medium">
                             Criar conta
                         </Link>
                     </div>
