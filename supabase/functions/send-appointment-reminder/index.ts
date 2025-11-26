@@ -79,8 +79,76 @@ serve(async (req) => {
 Para confirmar, responda SIM.
 Para cancelar, responda NÃO.`;
 
-      // Aqui você integraria com WhatsApp Business API, SMS ou Email
-      // Por enquanto, apenas logamos
+      // Enviar via WhatsApp Business API
+      const whatsappToken = Deno.env.get("WHATSAPP_API_TOKEN");
+      const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
+      const patientPhone = patient?.phone?.replace(/\D/g, "") || ""; // Remove caracteres não numéricos
+      
+      if (whatsappToken && phoneNumberId && patientPhone) {
+        try {
+          const whatsappResponse = await fetch(
+            `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${whatsappToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: `55${patientPhone}`,
+                type: "text",
+                text: {
+                  body: message,
+                },
+              }),
+            }
+          );
+
+          const whatsappData = await whatsappResponse.json();
+          
+          if (whatsappResponse.ok) {
+            console.log(`WhatsApp enviado para ${patientName}:`, whatsappData);
+          } else {
+            console.error(`Erro ao enviar WhatsApp:`, whatsappData);
+          }
+        } catch (error) {
+          console.error("Erro ao enviar WhatsApp:", error);
+        }
+      }
+
+      // Enviar via Email (Resend)
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      const patientEmail = patient?.email;
+      
+      if (resendApiKey && patientEmail) {
+        try {
+          const emailResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${resendApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: "FisioFlow <noreply@moocafisio.com.br>",
+              to: patientEmail,
+              subject: "Lembrete de Agendamento - FisioFlow",
+              html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
+            }),
+          });
+
+          const emailData = await emailResponse.json();
+          
+          if (emailResponse.ok) {
+            console.log(`Email enviado para ${patientName}:`, emailData);
+          } else {
+            console.error(`Erro ao enviar email:`, emailData);
+          }
+        } catch (error) {
+          console.error("Erro ao enviar email:", error);
+        }
+      }
+
       const orgId = (appointment as any).org_id || null;
       await supabaseClient.from("communication_logs").insert({
         org_id: orgId,

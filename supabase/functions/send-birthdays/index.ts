@@ -55,7 +55,76 @@ serve(async (req) => {
 
 A equipe ${orgName} deseja um dia especial!`;
 
-      // Aqui você integraria com WhatsApp Business API, SMS ou Email
+      // Enviar via WhatsApp Business API
+      const whatsappToken = Deno.env.get("WHATSAPP_API_TOKEN");
+      const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
+      const patientPhone = patient.phone?.replace(/\D/g, "") || ""; // Remove caracteres não numéricos
+      
+      if (whatsappToken && phoneNumberId && patientPhone) {
+        try {
+          const whatsappResponse = await fetch(
+            `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${whatsappToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: `55${patientPhone}`,
+                type: "text",
+                text: {
+                  body: message,
+                },
+              }),
+            }
+          );
+
+          const whatsappData = await whatsappResponse.json();
+          
+          if (whatsappResponse.ok) {
+            console.log(`WhatsApp de aniversário enviado para ${patient.full_name}:`, whatsappData);
+          } else {
+            console.error(`Erro ao enviar WhatsApp:`, whatsappData);
+          }
+        } catch (error) {
+          console.error("Erro ao enviar WhatsApp:", error);
+        }
+      }
+
+      // Enviar via Email (Resend)
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      const patientEmail = patient.email;
+      
+      if (resendApiKey && patientEmail) {
+        try {
+          const emailResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${resendApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: "FisioFlow <noreply@moocafisio.com.br>",
+              to: patientEmail,
+              subject: "🎉 Feliz Aniversário! - FisioFlow",
+              html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
+            }),
+          });
+
+          const emailData = await emailResponse.json();
+          
+          if (emailResponse.ok) {
+            console.log(`Email de aniversário enviado para ${patient.full_name}:`, emailData);
+          } else {
+            console.error(`Erro ao enviar email:`, emailData);
+          }
+        } catch (error) {
+          console.error("Erro ao enviar email:", error);
+        }
+      }
+
       await supabaseClient.from("communication_logs").insert({
         org_id: orgId,
         patient_id: patient.id,
