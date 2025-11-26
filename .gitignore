@@ -47,3 +47,4 @@ next-env.d.ts
 
 # Credentials (não commitar!)
 CREDENTIALS.md
+QSTASH_CREDENTIALS.md
