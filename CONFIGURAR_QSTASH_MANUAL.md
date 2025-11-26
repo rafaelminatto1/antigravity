@@ -12,6 +12,8 @@
 
 ## 2. Criar Schedule 1: Lembretes de Agendamento
 
+> **💡 Dica:** Quando clicar em "+ New" nos Headers, aparecerá um dropdown com opções do QStash. Para "Authorization", digite manualmente. Para "Upstash-Cron", selecione da lista.
+
 ### Passos:
 
 1. No menu lateral, clique em **Schedules**
@@ -30,15 +32,18 @@
    - Deixe vazio (campo opcional)
 
    **Headers:**
-   - **Content-Type:** `application/json`
+   - **Content-Type:** `application/json` (já deve estar preenchido)
+   
    - Clique em **+ New** para adicionar novo header
-   - **Name:** `Authorization`
+   - **IMPORTANTE:** Quando clicar em "+ New", aparecerá um dropdown com opções do QStash (Upstash-Delay, Upstash-Timeout, etc.)
+   - Para adicionar o header "Authorization", você precisa **digitar manualmente** no campo "Name" (não está na lista)
+   - **Name:** Digite `Authorization`
    - **Value:** `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZnhuaWl0ZmJidnNhc2tpY2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMDU0NDcsImV4cCI6MjA3Mzg4MTQ0N30.1duUQHT_MjGOmMKP-b-R6A9VByGzHgj296A2UR-IXvA`
    
    - Clique em **+ New** novamente para adicionar o cron
-   - **Name:** `Upstash-Cron`
+   - **IMPORTANTE:** Desta vez, no dropdown que aparece, **selecione** `Upstash-Cron` (está na lista!)
    - **Value:** `0 8 * * *`
-   - No dropdown ao lado, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
+   - No dropdown ao lado do valor, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
 
    **Default options:**
    - **Method:** Já deve estar como `POST` (verificar)
@@ -49,6 +54,8 @@
 ---
 
 ## 3. Criar Schedule 2: Mensagens de Aniversário
+
+> **💡 Dica:** Quando clicar em "+ New" nos Headers, aparecerá um dropdown com opções do QStash. Para "Authorization", digite manualmente. Para "Upstash-Cron", selecione da lista.
 
 ### Passos:
 
@@ -67,15 +74,18 @@
    - Deixe vazio (campo opcional)
 
    **Headers:**
-   - **Content-Type:** `application/json`
+   - **Content-Type:** `application/json` (já deve estar preenchido)
+   
    - Clique em **+ New** para adicionar novo header
-   - **Name:** `Authorization`
+   - **IMPORTANTE:** Quando clicar em "+ New", aparecerá um dropdown com opções do QStash (Upstash-Delay, Upstash-Timeout, etc.)
+   - Para adicionar o header "Authorization", você precisa **digitar manualmente** no campo "Name" (não está na lista)
+   - **Name:** Digite `Authorization`
    - **Value:** `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZnhuaWl0ZmJidnNhc2tpY2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMDU0NDcsImV4cCI6MjA3Mzg4MTQ0N30.1duUQHT_MjGOmMKP-b-R6A9VByGzHgj296A2UR-IXvA`
    
    - Clique em **+ New** novamente para adicionar o cron
-   - **Name:** `Upstash-Cron`
+   - **IMPORTANTE:** Desta vez, no dropdown que aparece, **selecione** `Upstash-Cron` (está na lista!)
    - **Value:** `0 9 * * *`
-   - No dropdown ao lado, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
+   - No dropdown ao lado do valor, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
 
    **Default options:**
    - **Method:** Já deve estar como `POST` (verificar)
