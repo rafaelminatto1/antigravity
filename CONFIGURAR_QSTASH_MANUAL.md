@@ -19,30 +19,30 @@
 
 3. Preencha os campos:
 
-   **Destination URL:**
+   **Destination:**
+   - Selecione o dropdown e escolha **URL**
+   - No campo de URL, digite:
    ```
    https://urfxniitfbbvsaskicfo.supabase.co/functions/v1/send-appointment-reminder
    ```
 
-   **Cron Expression:**
-   ```
-   0 8 * * *
-   ```
-   (Diário às 8h UTC = 5h BRT)
-
-   **Method:**
-   ```
-   POST
-   ```
+   **Body:**
+   - Deixe vazio (campo opcional)
 
    **Headers:**
-   - Clique em **Add Header**
+   - **Content-Type:** `application/json`
+   - Clique em **+ New** para adicionar novo header
    - **Name:** `Authorization`
    - **Value:** `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZnhuaWl0ZmJidnNhc2tpY2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMDU0NDcsImV4cCI6MjA3Mzg4MTQ0N30.1duUQHT_MjGOmMKP-b-R6A9VByGzHgj296A2UR-IXvA`
    
-   - Clique em **Add Header** novamente
-   - **Name:** `Content-Type`
-   - **Value:** `application/json`
+   - Clique em **+ New** novamente para adicionar o cron
+   - **Name:** `Upstash-Cron`
+   - **Value:** `0 8 * * *`
+   - No dropdown ao lado, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
+
+   **Default options:**
+   - **Method:** Já deve estar como `POST` (verificar)
+   - **Retry:** Já deve estar como `3` (padrão)
 
 4. Clique em **Create** ou **Save**
 
@@ -56,30 +56,30 @@
 
 2. Preencha os campos:
 
-   **Destination URL:**
+   **Destination:**
+   - Selecione o dropdown e escolha **URL**
+   - No campo de URL, digite:
    ```
    https://urfxniitfbbvsaskicfo.supabase.co/functions/v1/send-birthdays
    ```
 
-   **Cron Expression:**
-   ```
-   0 9 * * *
-   ```
-   (Diário às 9h UTC = 6h BRT)
-
-   **Method:**
-   ```
-   POST
-   ```
+   **Body:**
+   - Deixe vazio (campo opcional)
 
    **Headers:**
-   - Clique em **Add Header**
+   - **Content-Type:** `application/json`
+   - Clique em **+ New** para adicionar novo header
    - **Name:** `Authorization`
    - **Value:** `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZnhuaWl0ZmJidnNhc2tpY2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMDU0NDcsImV4cCI6MjA3Mzg4MTQ0N30.1duUQHT_MjGOmMKP-b-R6A9VByGzHgj296A2UR-IXvA`
    
-   - Clique em **Add Header** novamente
-   - **Name:** `Content-Type`
-   - **Value:** `application/json`
+   - Clique em **+ New** novamente para adicionar o cron
+   - **Name:** `Upstash-Cron`
+   - **Value:** `0 9 * * *`
+   - No dropdown ao lado, selecione o timezone: `America/Sao_Paulo` (ou UTC se preferir)
+
+   **Default options:**
+   - **Method:** Já deve estar como `POST` (verificar)
+   - **Retry:** Já deve estar como `3` (padrão)
 
 3. Clique em **Create** ou **Save**
 
@@ -129,14 +129,23 @@
 
 ## 📝 Informações Importantes
 
-### Horários (UTC vs BRT)
+### Horários e Timezone
 
-- **8h UTC** = **5h BRT** (Horário de Brasília)
-- **9h UTC** = **6h BRT** (Horário de Brasília)
+**Importante:** O QStash permite selecionar o timezone no header `Upstash-Cron`.
 
-Se quiser ajustar para horário brasileiro:
-- **8h BRT** = `0 11 * * *` (11h UTC)
-- **9h BRT** = `0 12 * * *` (12h UTC)
+**Opções:**
+
+1. **Usar Timezone Brasil (Recomendado):**
+   - Selecione `America/Sao_Paulo` no dropdown
+   - **Cron:** `0 8 * * *` = 8h BRT (Horário de Brasília)
+   - **Cron:** `0 9 * * *` = 9h BRT (Horário de Brasília)
+
+2. **Usar UTC:**
+   - Selecione `UTC` no dropdown
+   - **Cron:** `0 8 * * *` = 8h UTC (5h BRT)
+   - **Cron:** `0 9 * * *` = 9h UTC (6h BRT)
+
+**Recomendação:** Use `America/Sao_Paulo` para facilitar o entendimento dos horários.
 
 ### Credenciais
 
