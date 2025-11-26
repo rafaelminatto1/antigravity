@@ -18,7 +18,7 @@ Write-Host "🚀 Configurando Cron Jobs no QStash..." -ForegroundColor Cyan
 Write-Host "`n📅 Configurando lembrete de agendamento (diário às 8h)..." -ForegroundColor Yellow
 
 $reminderBody = @{
-    destination = "$SupabaseUrl/functions/v1/send-appointment-reminder"
+    destination = "https://urfxniitfbbvsaskicfo.supabase.co/functions/v1/send-appointment-reminder"
     cron = "0 8 * * *"
     headers = @{
         Authorization = "Bearer $SupabaseAnonKey"
@@ -46,7 +46,7 @@ try {
 Write-Host "`n🎉 Configurando mensagens de aniversário (diário às 9h)..." -ForegroundColor Yellow
 
 $birthdayBody = @{
-    destination = "$SupabaseUrl/functions/v1/send-birthdays"
+    destination = "https://urfxniitfbbvsaskicfo.supabase.co/functions/v1/send-birthdays"
     cron = "0 9 * * *"
     headers = @{
         Authorization = "Bearer $SupabaseAnonKey"
