@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { appointmentService, Appointment, CreateAppointmentData } from "@/lib/services/appointmentService";
 import { toast } from "sonner";
+import { getErrorMessage, errorMessages } from "@/lib/utils/error-messages";
 
 export function useAppointments(filters: {
   startDate?: Date;
@@ -32,7 +33,8 @@ export function useCreateAppointment() {
       toast.success('Agendamento criado com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao criar agendamento');
+      const message = getErrorMessage(error, { entity: "agendamento", action: "criar" });
+      toast.error(message || errorMessages.appointment.create);
     },
   });
 }
@@ -48,7 +50,8 @@ export function useUpdateAppointment() {
       toast.success('Agendamento atualizado com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao atualizar agendamento');
+      const message = getErrorMessage(error, { entity: "agendamento", action: "atualizar" });
+      toast.error(message || errorMessages.appointment.update);
     },
   });
 }
@@ -63,7 +66,8 @@ export function useDeleteAppointment() {
       toast.success('Agendamento excluído com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao excluir agendamento');
+      const message = getErrorMessage(error, { entity: "agendamento", action: "excluir" });
+      toast.error(message || errorMessages.appointment.delete);
     },
   });
 }
@@ -78,7 +82,8 @@ export function useConfirmAppointment() {
       toast.success('Agendamento confirmado!');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao confirmar agendamento');
+      const message = getErrorMessage(error, { entity: "agendamento", action: "confirmar" });
+      toast.error(message || errorMessages.appointment.confirm);
     },
   });
 }
@@ -94,7 +99,8 @@ export function useCancelAppointment() {
       toast.success('Agendamento cancelado');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao cancelar agendamento');
+      const message = getErrorMessage(error, { entity: "agendamento", action: "cancelar" });
+      toast.error(message || errorMessages.appointment.cancel);
     },
   });
 }

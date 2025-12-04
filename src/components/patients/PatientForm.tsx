@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +15,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { maskCPF, unmaskCPF, validateCPF, maskPhone, unmaskPhone } from "@/lib/utils/masks";
 import { patientService, CreatePatientData } from "@/lib/services/patientService";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { getErrorMessage, errorMessages } from "@/lib/utils/error-messages";
 
 const patientSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -63,7 +65,57 @@ export function PatientForm({ open, onOpenChange, patientId, onSuccess }: Patien
   });
 
   // Carregar dados do paciente se estiver editando
-  // TODO: Implementar carregamento quando patientId for fornecido
+  useEffect(() => {
+    if (patientId && open) {
+      const loadPatient = async () => {
+        try {
+          setIsLoading(true);
+          const patient = await patientService.getPatientById(patientId);
+          if (patient) {
+            form.reset({
+              full_name: patient.full_name || "",
+              email: patient.email || "",
+              phone: patient.phone ? maskPhone(patient.phone) : "",
+              cpf: patient.cpf ? maskCPF(patient.cpf) : "",
+              birth_date: patient.birth_date || "",
+              address: patient.address || "",
+              emergency_contact_name: patient.emergency_contact?.name || "",
+              emergency_contact_phone: patient.emergency_contact?.phone ? maskPhone(patient.emergency_contact.phone) : "",
+              emergency_contact_relationship: patient.emergency_contact?.relationship || "",
+              medical_history: patient.medical_history?.notes || "",
+            });
+            setCpfValue(patient.cpf ? maskCPF(patient.cpf) : "");
+            setPhoneValue(patient.phone ? maskPhone(patient.phone) : "");
+            setEmergencyPhoneValue(patient.emergency_contact?.phone ? maskPhone(patient.emergency_contact.phone) : "");
+          }
+        } catch (error) {
+          console.error("Erro ao carregar paciente:", error);
+          const message = getErrorMessage(error, { entity: "paciente", action: "carregar" });
+          toast.error(message || errorMessages.patient.load);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadPatient();
+    } else if (!patientId && open) {
+      // Resetar formulário quando criar novo paciente
+      form.reset({
+        full_name: "",
+        email: "",
+        phone: "",
+        cpf: "",
+        birth_date: "",
+        address: "",
+        emergency_contact_name: "",
+        emergency_contact_phone: "",
+        emergency_contact_relationship: "",
+        medical_history: "",
+      });
+      setCpfValue("");
+      setPhoneValue("");
+      setEmergencyPhoneValue("");
+    }
+  }, [patientId, open, form]);
 
   const onSubmit = async (values: PatientFormValues) => {
     setIsLoading(true);
@@ -104,7 +156,9 @@ export function PatientForm({ open, onOpenChange, patientId, onSuccess }: Patien
       onSuccess?.();
     } catch (error) {
       console.error("Erro ao salvar paciente:", error);
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar paciente");
+      const action = patientId ? "atualizar" : "criar";
+      const message = getErrorMessage(error, { entity: "paciente", action });
+      toast.error(message || (patientId ? errorMessages.patient.update : errorMessages.patient.create));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +166,8 @@ export function PatientForm({ open, onOpenChange, patientId, onSuccess }: Patien
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto relative w-[95vw] sm:w-full animate-in fade-in zoom-in-95 duration-200">
+        <LoadingOverlay isLoading={isLoading && !!patientId} text="Carregando dados do paciente..." />
         <DialogHeader>
           <DialogTitle>{patientId ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
           <DialogDescription>
@@ -326,10 +381,13 @@ export function PatientForm({ open, onOpenChange, patientId, onSuccess }: Patien
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <LoadingButton
+                type="submit"
+                isLoading={isLoading}
+                loadingText={patientId ? "Atualizando..." : "Cadastrando..."}
+              >
                 {patientId ? "Atualizar" : "Cadastrar"}
-              </Button>
+              </LoadingButton>
             </DialogFooter>
           </form>
         </Form>

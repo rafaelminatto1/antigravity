@@ -28,6 +28,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 
 interface Notebook {
@@ -52,6 +62,8 @@ export function NotebooksClient({ notebooks: initialNotebooks, activeNotebook: i
     const [isDeleting, setIsDeleting] = useState(false);
     const [newNotebook, setNewNotebook] = useState({ title: '', content: '' });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [notebookToDelete, setNotebookToDelete] = useState<string | null>(null);
 
     const filteredNotebooks = notebooks.filter(notebook =>
         notebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -94,24 +106,35 @@ export function NotebooksClient({ notebooks: initialNotebooks, activeNotebook: i
         }
     };
 
-    const handleDeleteNotebook = async (id: string) => {
-        if (!confirm('Tem certeza que deseja excluir este notebook?')) return;
+    const handleDeleteClick = (id: string) => {
+        setNotebookToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!notebookToDelete) return;
 
         setIsDeleting(true);
         try {
-            const response = await fetch(`/api/notebooks/${id}`, {
+            const response = await fetch(`/api/notebooks/${notebookToDelete}`, {
                 method: 'DELETE',
             });
 
             if (response.ok) {
-                setNotebooks(notebooks.filter(n => n.id !== id));
-                if (activeNotebook?.id === id) {
+                toast.success('Notebook excluído com sucesso!');
+                setNotebooks(notebooks.filter(n => n.id !== notebookToDelete));
+                if (activeNotebook?.id === notebookToDelete) {
                     setActiveNotebook(null);
                     router.push('/notebooks');
                 }
+                setDeleteDialogOpen(false);
+                setNotebookToDelete(null);
+            } else {
+                toast.error('Erro ao excluir notebook');
             }
         } catch (error) {
             console.error('Error deleting notebook:', error);
+            toast.error('Erro ao excluir notebook');
         } finally {
             setIsDeleting(false);
         }
@@ -250,7 +273,7 @@ export function NotebooksClient({ notebooks: initialNotebooks, activeNotebook: i
                                             className="h-8 w-8 flex-shrink-0"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleDeleteNotebook(notebook.id);
+                                                handleDeleteClick(notebook.id);
                                             }}
                                             disabled={isDeleting}
                                         >
@@ -314,6 +337,34 @@ export function NotebooksClient({ notebooks: initialNotebooks, activeNotebook: i
                     </Card>
                 )}
             </div>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Notebook?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem certeza que deseja excluir este notebook? Esta ação não pode ser desfeita e todo o conteúdo será perdido permanentemente.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteConfirm}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Excluindo...
+                                </>
+                            ) : (
+                                'Excluir'
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

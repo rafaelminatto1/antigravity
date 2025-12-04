@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -92,7 +93,7 @@ export function AppointmentDetailModal({
   };
 
   const handleStartSession = () => {
-    router.push(`/sessions/${appointment.id}/evolution`);
+    router.push(`/patients/${appointment.patient_id}/evolution?appointmentId=${appointment.id}`);
     onOpenChange(false);
   };
 
@@ -102,7 +103,7 @@ export function AppointmentDetailModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full animate-in fade-in zoom-in-95 duration-200">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -183,10 +184,16 @@ export function AppointmentDetailModal({
               {/* Ações */}
               <div className="flex flex-wrap gap-2 pt-4 border-t">
                 {appointment.status === 'scheduled' && (
-                  <Button onClick={handleConfirm} variant="outline" size="sm">
+                  <LoadingButton
+                    onClick={handleConfirm}
+                    variant="outline"
+                    size="sm"
+                    isLoading={confirmMutation.isPending}
+                    loadingText="Confirmando..."
+                  >
                     <CheckCircle2 className="mr-2 h-4 w-4" />
                     Confirmar
-                  </Button>
+                  </LoadingButton>
                 )}
 
                 {appointment.status !== 'completed' && appointment.status !== 'canceled' && (
@@ -305,9 +312,15 @@ export function AppointmentDetailModal({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Manter Agendamento</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCancel} className="bg-destructive">
-              Cancelar Agendamento
+            <AlertDialogCancel disabled={cancelMutation.isPending}>
+              Manter Agendamento
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancel}
+              className="bg-destructive"
+              disabled={cancelMutation.isPending}
+            >
+              {cancelMutation.isPending ? "Cancelando..." : "Cancelar Agendamento"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -323,9 +336,15 @@ export function AppointmentDetailModal({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive">
-              Excluir
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive"
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

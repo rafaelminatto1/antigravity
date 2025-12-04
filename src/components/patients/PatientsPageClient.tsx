@@ -22,15 +22,15 @@ export function PatientsPageClient({ initialPatients }: PatientsPageClientProps)
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gradient">Pacientes</h2>
-                    <p className="text-muted-foreground">
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gradient">Pacientes</h2>
+                    <p className="text-sm sm:text-base text-muted-foreground mt-1">
                         Gerencie prontuários, evoluções e histórico clínico.
                     </p>
                 </div>
-                <Button onClick={() => setIsFormOpen(true)}>
+                <Button onClick={() => setIsFormOpen(true)} className="w-full sm:w-auto">
                     <UserPlus className="mr-2 h-4 w-4" />
                     Novo Paciente
                 </Button>

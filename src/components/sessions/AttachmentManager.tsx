@@ -12,6 +12,19 @@ import { prontuarioService, MedicalAttachment } from "@/lib/services/prontuarioS
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { getErrorMessage, errorMessages } from "@/lib/utils/error-messages";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AttachmentManagerProps {
   patientId: string;
@@ -23,6 +36,8 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadData, setUploadData] = useState({
     description: "",
@@ -40,7 +55,8 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
       setAttachments(data);
     } catch (error) {
       console.error("Erro ao carregar anexos:", error);
-      toast.error("Erro ao carregar anexos");
+      const message = getErrorMessage(error, { entity: "anexos", action: "carregar" });
+      toast.error(message || errorMessages.attachment.load);
     } finally {
       setIsLoading(false);
     }
@@ -67,22 +83,31 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
       }
     } catch (error) {
       console.error("Erro ao enviar arquivo:", error);
-      toast.error("Erro ao enviar arquivo");
+      const message = getErrorMessage(error, { entity: "arquivo", action: "enviar" });
+      toast.error(message || errorMessages.attachment.upload);
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleDelete = async (attachmentId: string) => {
-    if (!confirm("Tem certeza que deseja excluir este anexo?")) return;
+  const handleDeleteClick = (attachmentId: string) => {
+    setAttachmentToDelete(attachmentId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!attachmentToDelete) return;
 
     try {
-      await prontuarioService.deleteAttachment(attachmentId);
+      await prontuarioService.deleteAttachment(attachmentToDelete);
       toast.success("Anexo excluído com sucesso!");
-      setAttachments(attachments.filter(a => a.id !== attachmentId));
+      setAttachments(attachments.filter(a => a.id !== attachmentToDelete));
+      setDeleteDialogOpen(false);
+      setAttachmentToDelete(null);
     } catch (error) {
       console.error("Erro ao excluir anexo:", error);
-      toast.error("Erro ao excluir anexo");
+      const message = getErrorMessage(error, { entity: "anexo", action: "excluir" });
+      toast.error(message || errorMessages.attachment.delete);
     }
   };
 
@@ -112,6 +137,7 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
             variant="outline"
             size="sm"
             onClick={() => setShowUploadForm(!showUploadForm)}
+            disabled={isUploading}
           >
             <Upload className="mr-2 h-4 w-4" />
             Novo Anexo
@@ -173,7 +199,10 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
         )}
 
         {isLoading ? (
-          <div className="text-center py-8 text-muted-foreground">Carregando anexos...</div>
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <LoadingSpinner size="lg" />
+            <p className="text-sm text-muted-foreground">Carregando anexos...</p>
+          </div>
         ) : attachments.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             Nenhum anexo cadastrado
@@ -214,7 +243,7 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(attachment.id)}
+                    onClick={() => handleDeleteClick(attachment.id)}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -224,6 +253,26 @@ export function AttachmentManager({ patientId, sessionId }: AttachmentManagerPro
           </div>
         )}
       </CardContent>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Anexo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este anexo? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
